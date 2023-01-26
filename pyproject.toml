@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "data-healthcare-dao-sensors"
+version = "0.1.0"
+description = "Code FileCOin Hackathon"
+authors = ["Oriojas <oscarriojas@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "data_healthcare_dao_sensors"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.89.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
