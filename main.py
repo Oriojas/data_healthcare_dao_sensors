@@ -26,6 +26,8 @@ async def import_wallet(token: str):
         print("Bad token")
         wallet = None
 
+    subprocess.run(["lighthouse-web3", "wallet"])
+
     return wallet
 
 
