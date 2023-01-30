@@ -1,4 +1,7 @@
-import subprocess
+import os
+import pexpect
+
+PSW = os.environ["PSW"]
 
 
 class lightHouse:
@@ -7,8 +10,19 @@ class lightHouse:
         self.light = "lighthouse-web3"
 
     def send_data_lh(self, path: str):
-        data = subprocess.run([self.light, "upload-encrypted", f"{path}"],
-                              capture_output=True,
-                              encoding='UTF-8')
+        s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}")
+        s_data.expect("Y/n")
+        s_data.sendline("Y")
+        s_data.expect("Enter your password:")
+        s_data.sendline(f"{PSW}")
+        s_data.expect("File Uploaded, visit following url to view content!")
+        log = s_data.buffer.decode("utf-8").split()
 
-        return data
+        logs = []
+        for line in log:
+            logs.append(line)
+
+        index_data = {"url": logs[1],
+                      "CID": logs[3]}
+
+        return index_data

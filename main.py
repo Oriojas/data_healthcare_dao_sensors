@@ -1,6 +1,7 @@
 import os
 import pyodbc
 import uvicorn
+import pexpect
 import subprocess
 import pandas as pd
 from fastapi import FastAPI
@@ -35,16 +36,24 @@ async def send_data(user: str, bpm: float, spo2: int):
     return JSONResponse(content=json_resp)
 
 
+
 @app.get("/import_wallet/")
 async def import_wallet(token: str):
     if token == TOKEN:
-        new_wallet = subprocess.run(["lighthouse-web3", "import-wallet", "--key", f"{PK}"],
-                                    input=b"{PSW}")
+        new_wallet = pexpect.spawn(f"lighthouse-web3 import-wallet --key {PK}")
+        new_wallet.expect("Set a password for your wallet:")
+        new_wallet.sendline(f"{PSW}")
+        new_wallet.expect("Public Key:")
+        log = new_wallet.buffer.decode("utf-8").split()
+
+        logs = []
+        for line in log:
+            logs.append(line)
     else:
         print("Bad token")
-        new_wallet = None
+        logs = [None]
 
-    return new_wallet.stdout
+    return logs[0]
 
 
 @app.get("/get_wallet/")
