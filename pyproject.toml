@@ -8,10 +8,11 @@ readme = "README.md"
 packages = [{include = "data_healthcare_dao_sensors"}]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">=3.8,<4.0"
 fastapi = "^0.89.1"
 uvicorn = "^0.20.0"
 pyodbc = "^4.0.35"
+pandas = "^1.5.3"
 
 
 [build-system]
