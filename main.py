@@ -46,6 +46,7 @@ async def send_data(user: str, bpm: float, spo2: int):
         path_file = f"temp_data/{user}_{date_n}.csv"
         df_ipfs_send.to_csv(path_file)
         index_data = dlh.lightHouse().send_data_lh(path=path_file)
+        os.remove(path_file)
 
         if index_data.get("url")[0] == " ":
             data["URL"] = index_data.get("url").split()[1]
@@ -69,7 +70,8 @@ async def send_data(user: str, bpm: float, spo2: int):
                 conn.commit()
                 print(f'Rows inserted: {str(count)}')
 
-        os.remove(path_file)
+        df_sensor = df_sensor.drop(list(df_ipfs_send.index), axis=0)
+        df_sensor.to_csv('temp_data/temp_data.csv')
 
     else:
         df_sensor.to_csv('temp_data/temp_data.csv')
