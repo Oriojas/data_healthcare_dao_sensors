@@ -10,7 +10,7 @@ class lightHouse:
         self.light = "lighthouse-web3"
 
     def send_data_lh(self, path: str):
-        s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}")
+        s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}", timeout=80)
         s_data.expect("Y/n")
         s_data.sendline("Y")
         s_data.expect("Enter your password:")
