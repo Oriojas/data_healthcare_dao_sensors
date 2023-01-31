@@ -10,7 +10,7 @@ class lightHouse:
         self.light = "lighthouse-web3"
 
     def send_data_lh(self, path: str):
-        s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}", timeout=80)
+        s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}", timeout=100)
         s_data.expect("Y/n")
         s_data.sendline("Y")
         s_data.expect("Enter your password:")
@@ -22,7 +22,11 @@ class lightHouse:
         for line in log:
             logs.append(line)
 
-        index_data = {"url": logs[1],
-                      "CID": logs[3]}
+        if len(logs) == 4:
+            index_data = {"url": logs[1],
+                          "CID": logs[3]}
+        else:
+            index_data = {"url": logs[1],
+                          "CID": None}
 
         return index_data

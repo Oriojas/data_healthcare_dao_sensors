@@ -23,7 +23,6 @@ DELAY = int(os.environ["DELAY"])
 INSTANCE = os.environ["INSTANCE"]
 DATABASE = os.environ["DATABASE"]
 USERNAME = os.environ["USERNAME"]
-PASSWORD = os.environ["PASSWORD"]
 
 
 @app.get("/send_data/")
@@ -47,8 +46,29 @@ async def send_data(user: str, bpm: float, spo2: int):
         path_file = f"temp_data/{user}_{date_n}.csv"
         df_ipfs_send.to_csv(path_file)
         index_data = dlh.lightHouse().send_data_lh(path=path_file)
-        data["URL"] = index_data.get("url")
+
+        if index_data.get("url")[0] == " ":
+            data["URL"] = index_data.get("url").split()[1]
+        else:
+            data["URL"] = index_data.get("url")
+
         data["CID"] = index_data.get("CID")
+
+        BPM = data.get('BPM')
+        SPO2 = data.get('SPO2')
+        DATE_C = data.get('DATE_C')
+        USER_DATA = data.get('USER')
+        URL = data.get('URL')
+        CID = data.get('CID')
+
+        with pyodbc.connect(
+                'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW) as conn:
+            with conn.cursor() as cursor:
+                count = cursor.execute(
+                    f"INSERT INTO {INSTANCE} (BPM, SPO2, DATE_C, USER_DATA, URL, CID) VALUES ({BPM}, {SPO2}, '{DATE_C}', '{USER_DATA}', '{URL}', '{CID}');").rowcount
+                conn.commit()
+                print(f'Rows inserted: {str(count)}')
+
         os.remove(path_file)
 
     else:
