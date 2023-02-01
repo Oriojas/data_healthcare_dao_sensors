@@ -1,4 +1,5 @@
 import os
+import time
 import pexpect
 
 PSW = os.environ["PSW"]
@@ -17,6 +18,7 @@ class lightHouse:
         s_data.expect("Enter your password:")
         s_data.sendline(f"{PSW}")
         s_data.expect("File Uploaded, visit following url to view content!")
+        time.sleep(10)
         log = s_data.buffer.decode("utf-8").split()
 
         logs = []
@@ -41,6 +43,7 @@ class lightHouse:
         d_data.expect("Enter your password:")
         d_data.sendline(f"{PSW}")
         d_data.expect("Decrypted")
+        time.sleep(10)
         log = d_data.before.decode("utf-8")
 
         print(f"{log}")
