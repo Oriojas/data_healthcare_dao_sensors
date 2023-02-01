@@ -52,7 +52,10 @@ async def send_data(user: str, bpm: float, spo2: int):
         else:
             data["URL"] = index_data.get("url")
 
-        data["CID"] = index_data.get("CID")
+        if index_data.get("CID") is None:
+            data["CID"] = data["URL"].replace("https://files.lighthouse.storage/viewFile/", "")
+        else:
+            data["CID"] = index_data.get("CID")
 
         BPM = data.get('BPM')
         SPO2 = data.get('SPO2')
