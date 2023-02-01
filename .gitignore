@@ -131,3 +131,5 @@ dmypy.json
 /temp_data/*.csv
 /test.py
 script.sh
+/node_modules
+*.json
