@@ -16,7 +16,6 @@ TOKEN = os.environ["TOKEN"]
 PK = os.environ["PK"]
 PSW = os.environ["PSW"]
 BATCH = os.environ["BATCH"]
-ROWS = os.environ["ROWS"]
 SERVER = os.environ["SERVER"]
 DRIVER = os.environ["DRIVER"]
 DELAY = int(os.environ["DELAY"])
