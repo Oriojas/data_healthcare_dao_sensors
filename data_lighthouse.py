@@ -23,7 +23,7 @@ class lightHouse:
             logs.append(line)
 
         if len(logs) == 4:
-            index_data = {"url": logs[1],
+            index_data = {"url": logs[1].replace("\u001b[32m\u001b[39m\u001b[36m", ""),
                           "CID": logs[3]}
         else:
             index_data = {"url": logs[1],
