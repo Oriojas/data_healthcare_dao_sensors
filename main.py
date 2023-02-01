@@ -83,6 +83,15 @@ async def send_data(user: str, bpm: float, spo2: int):
     return JSONResponse(content=json_resp)
 
 
+@app.get("/get_user_data/")
+async def get_user_data(user: str):
+    date_n = datetime.today().strftime('%Y_%m_%d_%H_%M_%S')
+    log = dlh.lightHouse().download_data_lh(cid=user)
+    log = log.split()
+
+    return log[0]
+
+
 @app.get("/import_wallet/")
 async def import_wallet(token: str):
     if token == TOKEN:

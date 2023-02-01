@@ -133,3 +133,4 @@ dmypy.json
 script.sh
 /node_modules
 *.json
+/download_data/*.csv

@@ -32,3 +32,14 @@ class lightHouse:
                           "CID": None}
 
         return index_data
+
+    def download_data_lh(self, cid: str):
+        d_data = pexpect.spawn(f"{self.light} decrypt-file {cid}",
+                               cwd="/home/oscar/GitHub/data_healthcare_dao_sensors/download_data/",
+                               timeout=100)
+        d_data.expect("Enter your password:")
+        d_data.sendline(f"{PSW}")
+        d_data.expect("Decrypted")
+        log = d_data.before.decode("utf-8")
+
+        return log.replace(" \u001b[22G\r\r\n", "")
