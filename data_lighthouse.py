@@ -2,6 +2,7 @@ import os
 import pexpect
 
 PSW = os.environ["PSW"]
+FOLDER_D = os.environ["FOLDER_D"]
 
 
 class lightHouse:
@@ -35,11 +36,13 @@ class lightHouse:
 
     def download_data_lh(self, cid: str):
         d_data = pexpect.spawn(f"{self.light} decrypt-file {cid}",
-                               cwd="/home/oscar/GitHub/data_healthcare_dao_sensors/download_data/",
+                               cwd=FOLDER_D,
                                timeout=100)
         d_data.expect("Enter your password:")
         d_data.sendline(f"{PSW}")
         d_data.expect("Decrypted")
         log = d_data.before.decode("utf-8")
 
-        return log.replace(" \u001b[22G\r\r\n", "")
+        print(f"{log}")
+
+        return log.replace("\u001b[92m", "")

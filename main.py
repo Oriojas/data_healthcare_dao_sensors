@@ -89,7 +89,7 @@ async def get_user_data(user: str):
     log = dlh.lightHouse().download_data_lh(cid=user)
     log = log.split()
 
-    return log[0]
+    return log[1]
 
 
 @app.get("/import_wallet/")
