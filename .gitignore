@@ -134,3 +134,5 @@ script.sh
 /node_modules
 *.json
 /download_data/*.csv
+/oxy_web/env.h
+/oxy_web/env.cpp

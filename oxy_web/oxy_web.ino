@@ -2,15 +2,12 @@
 #include <ESP8266WebServer.h>
 #include <Wire.h>
 #include "MAX30100_PulseOximeter.h"
+#include "env.h"
 
 
 #define REPORTING_PERIOD_MS     1000
 
 float BPM, SpO2;
-
-/*Put your SSID & Password*/
-const char* ssid = "Milo";  // Enter SSID here
-const char* password = "97274340";  //Enter Password here
 
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
