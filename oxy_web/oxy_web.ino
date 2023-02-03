@@ -18,6 +18,8 @@ PulseOximeter pox;
 
 uint32_t tsLastReport = 0;
 
+void(* resetFunc) (void) = 0;
+
 ESP8266WebServer server(80);
 
 WiFiClient wifiClient;
@@ -88,10 +90,9 @@ void loop() {
 
       if (httpCode < 0) {
 
-          delay(5000);
+          resetFunc();
         
-        }
-        
+        }        
           
       http.end();
       
