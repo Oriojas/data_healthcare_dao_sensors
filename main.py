@@ -7,6 +7,7 @@ import subprocess
 import pandas as pd
 import all_user_data as ALLUD
 from fastapi import FastAPI
+from pydantic import BaseModel
 from datetime import datetime
 import data_lighthouse as dlh
 from fastapi.encoders import jsonable_encoder
@@ -25,6 +26,8 @@ INSTANCE = os.environ["INSTANCE"]
 DATABASE = os.environ["DATABASE"]
 USERNAME = os.environ["USERNAME"]
 FOLDER_D = os.environ["FOLDER_D"]
+
+CONEXION_BD = 'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW
 
 
 @app.get("/send_data/")
@@ -74,8 +77,7 @@ async def send_data(user: str, bpm: float, spo2: int):
         URL = data.get('URL')
         CID = data.get('CID')
 
-        with pyodbc.connect(
-                'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW) as conn:
+        with pyodbc.connect(CONEXION_BD) as conn:
             with conn.cursor() as cursor:
                 count = cursor.execute(
                     f"INSERT INTO {INSTANCE} (BPM, SPO2, DATE_C, USER_DATA, URL, CID) VALUES ({BPM}, {SPO2}, '{DATE_C}', '{USER_DATA}', '{URL}', '{CID}');").rowcount
@@ -100,8 +102,7 @@ async def get_user_data(user: str):
     :param user: str, user id
     :return: json object
     """
-    with pyodbc.connect(
-            'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW) as conn:
+    with pyodbc.connect(CONEXION_BD) as conn:
         sql_query_u = f"SELECT * FROM healthcaredao.dbo.demograficos WHERE ID = '{user}';"
         df_user = pd.DataFrame(pd.read_sql(sql_query_u, conn))
 
@@ -122,6 +123,29 @@ async def get_user_data(user: str):
     json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
 
     return json_data
+
+class Proposal(BaseModel):
+    id: str
+    description: str
+    requeried: bool
+    title: str
+    wallet: str
+
+
+@app.post("proposal")
+async  def create_proposal(proposal: Proposal)
+    count = 0
+    with pyodbc.connect(CONEXION_BD) as conn:
+        with conn.cursor() as cursor:
+            insert_proposal = f"INSERT INTO propuestas values({proposal.id},{proposal.description},{proposal.requeried},{proposal.title},{proposal.wallet});"
+            count = cursor.execute(insert_proposal).rowcount
+            conn.commit()
+
+            print(f'Rows inserted: {str(count)}')
+
+    return count
+
+
 
 
 @app.get("/import_wallet/")
