@@ -11,8 +11,19 @@ from datetime import datetime
 import data_lighthouse as dlh
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = ['*']
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 TOKEN = os.environ["TOKEN"]
 PK = os.environ["PK"]
