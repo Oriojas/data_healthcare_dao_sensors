@@ -131,7 +131,7 @@ async def get_user_data(user: str):
 @app.get("/import_wallet/")
 async def import_wallet(token: str):
     """
-
+    This function query used wallet
     :param token:
     :return:
     """
