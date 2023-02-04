@@ -9,9 +9,17 @@ FOLDER_D = os.environ["FOLDER_D"]
 class lightHouse:
 
     def __init__(self):
+        """
+        Init class
+        """
         self.light = "lighthouse-web3"
 
     def send_data_lh(self, path: str):
+        """
+        This function upload data to lighthouse
+        :param path:
+        :return:
+        """
         s_data = pexpect.spawn(f"{self.light} upload-encrypted {path}", timeout=100)
         s_data.expect("Y/n")
         time.sleep(3)
@@ -41,6 +49,11 @@ class lightHouse:
         return index_data
 
     def download_data_lh(self, cid: str):
+        """
+        This function download data from IPFS lighthouse
+        :param cid:
+        :return:
+        """
         d_data = pexpect.spawn(f"{self.light} decrypt-file {cid}",
                                cwd=FOLDER_D,
                                timeout=100)

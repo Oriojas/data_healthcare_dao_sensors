@@ -26,14 +26,15 @@ DATABASE = os.environ["DATABASE"]
 USERNAME = os.environ["USERNAME"]
 FOLDER_D = os.environ["FOLDER_D"]
 
+
 @app.get("/send_data/")
 async def send_data(user: str, bpm: float, spo2: int):
     """
-
-    :param user:
-    :param bpm:
-    :param spo2:
-    :return:
+    This function send data to IPFS with AWS endpoint
+    :param user: str, user identifier
+    :param bpm: float, user data BPM
+    :param spo2: int, user SpO2
+    :return: json object
     """
     df_sensor = pd.read_csv('temp_data/temp_data.csv', index_col=0)
 
@@ -95,9 +96,9 @@ async def send_data(user: str, bpm: float, spo2: int):
 @app.get("/get_user_data/")
 async def get_user_data(user: str):
     """
-
-    :param user:
-    :return:
+    This function returns user data save in lighthouse
+    :param user: str, user id
+    :return: json object
     """
     with pyodbc.connect(
             'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW) as conn:
@@ -150,8 +151,8 @@ async def import_wallet(token: str):
 @app.get("/get_wallet/")
 async def get_wallet():
     """
-
-    :return:
+    This function query wallet used
+    :return: identifier wallet and blockchain network
     """
     wallet = subprocess.run(["lighthouse-web3", "wallet"],
                             capture_output=True,
