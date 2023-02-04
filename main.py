@@ -5,6 +5,7 @@ import uvicorn
 import pexpect
 import subprocess
 import pandas as pd
+import all_user_data as ALLUD
 from fastapi import FastAPI
 from datetime import datetime
 import data_lighthouse as dlh
@@ -23,7 +24,7 @@ DELAY = int(os.environ["DELAY"])
 INSTANCE = os.environ["INSTANCE"]
 DATABASE = os.environ["DATABASE"]
 USERNAME = os.environ["USERNAME"]
-
+FOLDER_D = os.environ["FOLDER_D"]
 
 @app.get("/send_data/")
 async def send_data(user: str, bpm: float, spo2: int):
@@ -117,7 +118,9 @@ async def get_user_data(user: str):
 
     time.sleep(30)
 
-    return files
+    json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
+
+    return json_data
 
 
 @app.get("/import_wallet/")

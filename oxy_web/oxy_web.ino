@@ -84,9 +84,10 @@ void loop() {
            
       http.begin(wifiClient, serverPath);                         
       int httpCode = http.GET();      
-     
+
       Serial.print("Response: ");
       Serial.println(httpCode);
+      Serial.println(user);
 
       if (httpCode < 0) {
 
