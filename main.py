@@ -1,4 +1,5 @@
 import os
+import time
 import pyodbc
 import uvicorn
 import pexpect
@@ -26,6 +27,13 @@ USERNAME = os.environ["USERNAME"]
 
 @app.get("/send_data/")
 async def send_data(user: str, bpm: float, spo2: int):
+    """
+
+    :param user:
+    :param bpm:
+    :param spo2:
+    :return:
+    """
     df_sensor = pd.read_csv('temp_data/temp_data.csv', index_col=0)
 
     date_c = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -85,15 +93,40 @@ async def send_data(user: str, bpm: float, spo2: int):
 
 @app.get("/get_user_data/")
 async def get_user_data(user: str):
-    date_n = datetime.today().strftime('%Y_%m_%d_%H_%M_%S')
-    log = dlh.lightHouse().download_data_lh(cid=user)
-    log = log.split()
+    """
 
-    return log[1]
+    :param user:
+    :return:
+    """
+    with pyodbc.connect(
+            'DRIVER=' + DRIVER + ';SERVER=tcp:' + SERVER + ';PORT=1433;DATABASE=' + DATABASE + ';UID=' + USERNAME + ';PWD=' + PSW) as conn:
+        sql_query_u = f"SELECT * FROM healthcaredao.dbo.demograficos WHERE ID = '{user}';"
+        df_user = pd.DataFrame(pd.read_sql(sql_query_u, conn))
+
+        sql_query_d = f"SELECT * FROM healthcaredao.dbo.datasensor WHERE USER_DATA = '{user}';"
+        df_user_data = pd.DataFrame(pd.read_sql(sql_query_d, conn))
+
+    df_all = df_user.merge(df_user_data, how='cross')
+
+    cid_list = list(df_all["CID"])
+
+    files = []
+    for cid in cid_list:
+        file = dlh.lightHouse().download_data_lh(cid=cid)
+        files.append(file)
+
+    time.sleep(30)
+
+    return files
 
 
 @app.get("/import_wallet/")
 async def import_wallet(token: str):
+    """
+
+    :param token:
+    :return:
+    """
     if token == TOKEN:
         new_wallet = pexpect.spawn(f"lighthouse-web3 import-wallet --key {PK}")
         new_wallet.expect("Set a password for your wallet:")
@@ -113,6 +146,10 @@ async def import_wallet(token: str):
 
 @app.get("/get_wallet/")
 async def get_wallet():
+    """
+
+    :return:
+    """
     wallet = subprocess.run(["lighthouse-web3", "wallet"],
                             capture_output=True,
                             encoding='UTF-8')
