@@ -120,8 +120,12 @@ async def get_user_data(user: str):
     time.sleep(30)
 
     json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
+    json_user = dict(df_user)
 
-    return json_data
+    json_data_e = jsonable_encoder(json_data)
+    json_user_e = jsonable_encoder(df_user.to_dict(orient="records"))
+
+    return JSONResponse(content=json_data_e), JSONResponse(content=json_user_e)
 
 
 @app.get("/import_wallet/")
@@ -166,6 +170,10 @@ async def get_wallet():
                                   "net": net})
 
     return JSONResponse(content=json_resp)
+
+
+    #@app.get("/acc_data/")
+    #def acc_data()
 
 
 if __name__ == '__main__':
