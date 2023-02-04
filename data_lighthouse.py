@@ -27,15 +27,15 @@ class lightHouse:
 
         logs = []
         for line in log:
-            logs.append(line.replace("\u001b[32m\u001b[39m\u001b[36m", ""))
+            logs.append(line.replace("\x1b[39m", ""))
 
         print(logs)
 
         if len(logs) == 4:
-            index_data = {"url": logs[1].replace("\u001b[39m", ""),
+            index_data = {"url": logs[2].replace("\x1b[39m", ""),
                           "CID": logs[-1]}
         else:
-            index_data = {"url": logs[1].replace("\u001b[39m", ""),
+            index_data = {"url": logs[2].replace("\x1b[39m", ""),
                           "CID": None}
 
         return index_data
