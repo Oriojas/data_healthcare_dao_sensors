@@ -162,6 +162,38 @@ async def create_proposal(proposal: Proposal):
     return count
 
 
+class Form(BaseModel):
+    INSTITUCION: str
+    WALLET: str
+    NOMBRE_PROYECTO: str
+    MIN_EDAD: int
+    MAX_EDAD: int
+    MIN_PESO: int
+    MAX_PESO: int
+    MIN_ESTATURA: int
+    MAX_ESTATURA: int
+    PAIS: str
+    GENERO: str
+    COSTO: float
+    FECHA_HORA: str
+    TIME_STAMP: int
+    ID_QUERY: int
+
+
+@app.post("/form/")
+async def create_proposal(form: Form):
+    count = 0
+    with pyodbc.connect(CONEXION_BD) as conn:
+        with conn.cursor() as cursor:
+            insert_proposal = f"INSERT INTO healthcaredao.dbo.acc_data (INSTITUCION, WALLET, NOMBRE_PROYECTO, MIN_EDAD, MAX_EDAD, MIN_PESO, MAX_PESO, MIN_ESTATURA, MAX_ESTATURA, PAIS, GENERO, COSTO, FECHA_HORA, TIME_STAMP, ID_QUERY) VALUES('{form.INSTITUCION}', '{form.WALLET}', '{form.NOMBRE_PROYECTO}', {form.MIN_EDAD}, {form.MAX_EDAD}, {form.MIN_PESO}, {form.MAX_PESO}, {form.MIN_ESTATURA}, {form.MAX_ESTATURA}, '{form.PAIS}', '{form.GENERO}', '{form.COSTO}', '{form.FECHA_HORA}', '{form.TIME_STAMP}', {form.ID_QUERY});"
+            count = cursor.execute(insert_proposal).rowcount
+            conn.commit()
+
+            print(f'Rows inserted: {str(count)}')
+
+    return count
+
+
 @app.get("/import_wallet/")
 async def import_wallet(token: str):
     """
