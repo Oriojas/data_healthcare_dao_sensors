@@ -139,28 +139,27 @@ async def get_user_data(user: str):
 
     return JSONResponse(content=json_data_e), JSONResponse(content=json_user_e)
 
+
 class Proposal(BaseModel):
-    id: str
-    description: str
-    requeried: bool
-    title: str
-    wallet: str
+    ID: str
+    DESCRIPCION: str
+    REQUERIDO: float
+    TITULO: str
+    WALLET: str
 
 
-@app.post("proposal")
-async  def create_proposal(proposal: Proposal)
+@app.post("/proposal/")
+async def create_proposal(proposal: Proposal):
     count = 0
     with pyodbc.connect(CONEXION_BD) as conn:
         with conn.cursor() as cursor:
-            insert_proposal = f"INSERT INTO propuestas values({proposal.id},{proposal.description},{proposal.requeried},{proposal.title},{proposal.wallet});"
+            insert_proposal = f"INSERT INTO healthcaredao.dbo.propuestas (ID, DESCRIPCION, REQUERIDO, TITULO, WALLET) VALUES('{proposal.ID}', '{proposal.DESCRIPCION}', {proposal.REQUERIDO}, '{proposal.TITULO}', '{proposal.WALLET}');"
             count = cursor.execute(insert_proposal).rowcount
             conn.commit()
 
             print(f'Rows inserted: {str(count)}')
 
     return count
-
-
 
 
 @app.get("/import_wallet/")
@@ -206,9 +205,8 @@ async def get_wallet():
 
     return JSONResponse(content=json_resp)
 
-
-    #@app.get("/acc_data/")
-    #def acc_data()
+    # @app.get("/acc_data/")
+    # def acc_data()
 
 
 if __name__ == '__main__':
