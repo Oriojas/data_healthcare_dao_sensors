@@ -236,19 +236,59 @@ async def get_wallet():
     return JSONResponse(content=json_resp)
 
 
-@app.get("/acc_data/")
-def acc_data(user: str):
+@app.get("/query_proposal/")
+async def query_proposal(wallet: str):
+    """
+    This function download and decrypt data from users
+    :param wallet: str, project wallet
+    :return: json object with user data and data dencrypted
+    """
     with pyodbc.connect(CONEXION_BD) as conn:
-        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE USER_DATA = '{user}';"
+        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE WALLET = '{wallet}';"
         df_user = pd.DataFrame(pd.read_sql(query_user, conn))
 
-    time_stamp = datetime.datetime.timestamp(datetime.datetime.now())
-    df_user = df_user[df_user["TIME_STAMP"] <= time_stamp]
+    time_stamp = datetime.timestamp(datetime.now())
+    #df_user = df_user[df_user["TIME_STAMP"] <= time_stamp]
+
+    MIN_EDAD = int(df_user["MIN_EDAD"].iloc[0])
+    MAX_EDAD = int(df_user["MAX_EDAD"].iloc[0])
+    MIN_PESO = int(df_user["MIN_PESO"].iloc[0])
+    MAX_PESO = int(df_user["MAX_PESO"].iloc[0])
+    MIN_ESTATURA = int(df_user["MIN_ESTATURA"].iloc[0])
+    MAX_ESTATURA = int(df_user["MAX_ESTATURA"].iloc[0])
+    PAIS = df_user["PAIS"].iloc[0]
+    GENERO = df_user["GENERO"].iloc[0]
 
     with pyodbc.connect(CONEXION_BD) as conn:
-        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE USER_DATA = '{user}';"
-        df_user = pd.DataFrame(pd.read_sql(query_user, conn))
+        query_data = f"SELECT * FROM healthcaredao.dbo.demograficos WHERE EDAD >= {MIN_EDAD} AND EDAD <= {MAX_EDAD} AND ESTATURA >= {MIN_ESTATURA} AND ESTATURA <= {MAX_ESTATURA} AND PESO >= {MIN_PESO} AND PESO <= {MAX_PESO} AND LOCALIZACION = '{PAIS}' AND GENERO = '{GENERO}';"
+        df_user_filter = pd.DataFrame(pd.read_sql(query_data, conn))
 
+    list_w = str(tuple(df_user_filter["ID"]))
+
+    dict_users = df_user_filter.to_dict(orient='records')
+    json_users = jsonable_encoder(dict_users)
+
+    with pyodbc.connect(CONEXION_BD) as conn:
+        query_data = f"SELECT * FROM healthcaredao.dbo.datasensor WHERE USER_DATA IN {list_w};"
+        df_data_filter = pd.DataFrame(pd.read_sql(query_data, conn))
+
+    list_cid = list(df_data_filter["CID"])
+
+    files = []
+
+    for cid in list_cid:
+        try:
+            file = dlh.lightHouse().download_data_lh(cid=cid)
+            files.append(file)
+        except:
+            pass
+
+    time.sleep(20)
+
+    json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
+    json_data_e = jsonable_encoder(json_data)
+
+    return JSONResponse(content=json_data_e), JSONResponse(content=json_users)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=8088)
