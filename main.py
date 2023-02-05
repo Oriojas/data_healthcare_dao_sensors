@@ -174,8 +174,6 @@ class Form(BaseModel):
     MAX_ESTATURA: int
     PAIS: str
     GENERO: str
-    COSTO: float
-    FECHA_HORA: str
     TIME_STAMP: int
     ID_QUERY: int
 
@@ -185,7 +183,7 @@ async def create_proposal(form: Form):
     count = 0
     with pyodbc.connect(CONEXION_BD) as conn:
         with conn.cursor() as cursor:
-            insert_proposal = f"INSERT INTO healthcaredao.dbo.acc_data (INSTITUCION, WALLET, NOMBRE_PROYECTO, MIN_EDAD, MAX_EDAD, MIN_PESO, MAX_PESO, MIN_ESTATURA, MAX_ESTATURA, PAIS, GENERO, COSTO, FECHA_HORA, TIME_STAMP, ID_QUERY) VALUES('{form.INSTITUCION}', '{form.WALLET}', '{form.NOMBRE_PROYECTO}', {form.MIN_EDAD}, {form.MAX_EDAD}, {form.MIN_PESO}, {form.MAX_PESO}, {form.MIN_ESTATURA}, {form.MAX_ESTATURA}, '{form.PAIS}', '{form.GENERO}', '{form.COSTO}', '{form.FECHA_HORA}', '{form.TIME_STAMP}', {form.ID_QUERY});"
+            insert_proposal = f"INSERT INTO healthcaredao.dbo.acc_data (INSTITUCION, WALLET, NOMBRE_PROYECTO, MIN_EDAD, MAX_EDAD, MIN_PESO, MAX_PESO, MIN_ESTATURA, MAX_ESTATURA, PAIS, GENERO, TIME_STAMP, ID_QUERY) VALUES('{form.INSTITUCION}', '{form.WALLET}', '{form.NOMBRE_PROYECTO}', {form.MIN_EDAD}, {form.MAX_EDAD}, {form.MIN_PESO}, {form.MAX_PESO}, {form.MIN_ESTATURA}, {form.MAX_ESTATURA}, '{form.PAIS}', '{form.GENERO}', '{form.TIME_STAMP}', {form.ID_QUERY});"
             count = cursor.execute(insert_proposal).rowcount
             conn.commit()
 
@@ -237,8 +235,19 @@ async def get_wallet():
 
     return JSONResponse(content=json_resp)
 
-    # @app.get("/acc_data/")
-    # def acc_data()
+
+@app.get("/acc_data/")
+def acc_data(user: str):
+    with pyodbc.connect(CONEXION_BD) as conn:
+        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE USER_DATA = '{user}';"
+        df_user = pd.DataFrame(pd.read_sql(query_user, conn))
+
+    time_stamp = datetime.datetime.timestamp(datetime.datetime.now())
+    df_user = df_user[df_user["TIME_STAMP"] <= time_stamp]
+
+    with pyodbc.connect(CONEXION_BD) as conn:
+        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE USER_DATA = '{user}';"
+        df_user = pd.DataFrame(pd.read_sql(query_user, conn))
 
 
 if __name__ == '__main__':
