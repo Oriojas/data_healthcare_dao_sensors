@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import pyodbc
 import uvicorn
 import pexpect
@@ -10,7 +11,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 import data_lighthouse as dlh
-from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -272,7 +272,7 @@ async def query_proposal(wallet: str):
     else:
         str_w = f"IN {str(tuple_w)}"
 
-    dict_users = df_user_filter.to_dict(orient='records')
+    dict_users = df_user.to_dict(orient='records')
     json_users = jsonable_encoder(dict_users)
 
     with pyodbc.connect(CONEXION_BD) as conn:
@@ -292,9 +292,13 @@ async def query_proposal(wallet: str):
 
     time.sleep(20)
 
-    json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
+    data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
 
-    return Response(json_data), json_users
+    json_data = json.loads(data)
+
+    json_data["USER"] = json_users
+
+    return json_data
 
 
 if __name__ == '__main__':
