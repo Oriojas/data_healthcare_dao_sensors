@@ -296,7 +296,7 @@ async def query_proposal(wallet: str):
 
     json_data = json.loads(data)
 
-    json_data["USER"] = json_users
+    json_data["USER"] = dict(json_users[0])
 
     return [json_data]
 
