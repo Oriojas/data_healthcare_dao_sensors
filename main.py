@@ -244,7 +244,7 @@ async def query_proposal(wallet: str):
     :return: json object with user data and data dencrypted
     """
     with pyodbc.connect(CONEXION_BD) as conn:
-        query_user = f"SELECT * FROM healthcaredao.dbo.acc_data WHERE WALLET = '{wallet}';"
+        query_user = f"SELECT TOP 1 * FROM healthcaredao.dbo.acc_data WHERE WALLET = '{wallet}' ORDER BY WALLET;"
         df_user = pd.DataFrame(pd.read_sql(query_user, conn))
 
     time_stamp = datetime.timestamp(datetime.now())

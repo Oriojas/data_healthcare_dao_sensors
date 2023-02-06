@@ -5,6 +5,8 @@ The code FileCoin Hackaton
 `npm install -g @lighthouse-web3/sdk`
 
 1. Import wallet: `lighthouse-web3 import-wallet --key <private_key>`
+2. Create API key: `lighthouse-web3 api-key --new`
+3. View connection wallet: `lighthouse-web3 wallet`
 
 ## Create temp_data.csv
 
