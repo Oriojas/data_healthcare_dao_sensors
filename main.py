@@ -298,7 +298,7 @@ async def query_proposal(wallet: str):
 
     json_data["USER"] = json_users
 
-    return json_data
+    return [json_data]
 
 
 if __name__ == '__main__':
