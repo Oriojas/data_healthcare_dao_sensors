@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 import data_lighthouse as dlh
+from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -244,11 +245,11 @@ async def query_proposal(wallet: str):
     :return: json object with user data and data dencrypted
     """
     with pyodbc.connect(CONEXION_BD) as conn:
-        query_user = f"SELECT TOP 1 * FROM healthcaredao.dbo.acc_data WHERE WALLET = '{wallet}' ORDER BY WALLET;"
+        query_user = f"SELECT TOP 1 * FROM healthcaredao.dbo.acc_data WHERE WALLET = '{wallet}' ORDER BY 'ID_QUERY' ;"
         df_user = pd.DataFrame(pd.read_sql(query_user, conn))
 
     time_stamp = datetime.timestamp(datetime.now())
-    #df_user = df_user[df_user["TIME_STAMP"] <= time_stamp]
+    # df_user = df_user[df_user["TIME_STAMP"] <= time_stamp]
 
     MIN_EDAD = int(df_user["MIN_EDAD"].iloc[0])
     MAX_EDAD = int(df_user["MAX_EDAD"].iloc[0])
@@ -292,9 +293,9 @@ async def query_proposal(wallet: str):
     time.sleep(20)
 
     json_data = ALLUD.allUserData(folder=FOLDER_D).joint_data()
-    json_data_e = jsonable_encoder(json_data)
 
-    return JSONResponse(content=json_data_e), JSONResponse(content=json_users)
+    return Response(json_data), json_users
+
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=8088)
