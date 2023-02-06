@@ -263,13 +263,19 @@ async def query_proposal(wallet: str):
         query_data = f"SELECT * FROM healthcaredao.dbo.demograficos WHERE EDAD >= {MIN_EDAD} AND EDAD <= {MAX_EDAD} AND ESTATURA >= {MIN_ESTATURA} AND ESTATURA <= {MAX_ESTATURA} AND PESO >= {MIN_PESO} AND PESO <= {MAX_PESO} AND LOCALIZACION = '{PAIS}' AND GENERO = '{GENERO}';"
         df_user_filter = pd.DataFrame(pd.read_sql(query_data, conn))
 
-    list_w = str(tuple(df_user_filter["ID"]))
+    tuple_w = tuple(df_user_filter["ID"])
+    if len(tuple_w) == 1:
+        str_w = str(tuple_w[0]).replace(",", "")
+        str_w = f"= '{str_w}'"
+
+    else:
+        str_w = f"IN {str(tuple_w)}"
 
     dict_users = df_user_filter.to_dict(orient='records')
     json_users = jsonable_encoder(dict_users)
 
     with pyodbc.connect(CONEXION_BD) as conn:
-        query_data = f"SELECT * FROM healthcaredao.dbo.datasensor WHERE USER_DATA IN {list_w};"
+        query_data = f"SELECT * FROM healthcaredao.dbo.datasensor WHERE USER_DATA {str_w};"
         df_data_filter = pd.DataFrame(pd.read_sql(query_data, conn))
 
     list_cid = list(df_data_filter["CID"])
